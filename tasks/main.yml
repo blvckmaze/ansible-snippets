@@ -1,51 +1,55 @@
 ---
-- name: Update APT cache
-  when: ansible_os_family == "Debian"
-  apt:
-    update_cache: true
-
 - block:
+  - name: Update packages
+    shell: ":"
+    changed_when: true
+    notify:
+      - Update apt package index
+
+  - meta: flush_handlers
+
+  - name: Install prerequisites
+    apt:
+      pkg:
+        - curl
+        - gnupg
+        - ca-certificates
+
+  - name: Adding Docker’s official GPG key
+    shell: "{{ item }}"
+    with_items:
+      - sudo install -m 0755 -d /etc/apt/keyrings
+      - curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --batch --yes --dearmor -o /etc/apt/keyrings/docker.gpg
+      - sudo chmod a+r /etc/apt/keyrings/docker.gpg
+
+  - name: Setting up the repository
+    shell: |
+      echo "deb [arch="$(dpkg --print-architecture)" signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/ubuntu \
+      "$(. /etc/os-release && echo "$VERSION_CODENAME")" stable" | sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
+    notify:
+      - Update apt package index
+
+  - meta: flush_handlers
+
+  - name: Install Docker CE & dependencies
+    apt:
+      pkg:
+        - docker-ce
+        - docker-ce-cli
+        - containerd.io
+        - docker-buildx-plugin
+        - docker-compose-plugin
+
+  - name: Grant user access to Docker
+    user:
+      name: "{{ username }}"
+      groups: "docker"
+      append: true
+
+  - name: Starting and updating the Docker service to start on boot
+    service:
+      name: docker
+      state: "started"
+      enabled: true
+
   when: ansible_os_family == "Debian"
-    - name: Install prerequisites
-      apt:
-        pkg:
-          - curl
-          - gnupg
-          - ca-certificates
-
-    - name: Adding Docker’s official GPG key
-      shell: "{{ item }}"
-      with_items:
-        - sudo install -m 0755 -d /etc/apt/keyrings
-        - curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --dearmor -o /etc/apt/keyrings/docker.gpg
-        - sudo chmod a+r /etc/apt/keyrings/docker.gpg
-
-    - name: Setting up the repository
-      shell: |
-        echo "deb [arch="$(dpkg --print-architecture)" signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/ubuntu \
-        "$(. /etc/os-release && echo "$VERSION_CODENAME")" stable" | sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
-
-    - name: Update APT cache
-      apt:
-        update_cache: true
-
-    - name: Install Docker CE & dependencies
-      apt:
-        pkg:
-          - docker-ce
-          - docker-ce-cli
-          - containerd.io
-          - docker-buildx-plugin
-          - docker-compose-plugin
-
-    - name: Grant user access to Docker
-      user:
-        name: "{{ username }}"
-        groups: "docker"
-        append: true
-
-    - name: Starting and updating the Docker service to start on boot
-      service:
-        name: docker
-        state: "started"
-        enabled: true

@@ -1,0 +1,5 @@
+---
+- name: Update apt package index
+  when: ansible_os_family == "Debian"
+  apt:
+    update_cache: true
