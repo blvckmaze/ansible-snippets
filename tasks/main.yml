@@ -1,9 +1,11 @@
 ---
 - name: Update APT cache
+  when: ansible_os_family == "Debian"
   apt:
     update_cache: true
 
 - block:
+  when: ansible_os_family == "Debian"
     - name: Install prerequisites
       apt:
         pkg:
@@ -41,8 +43,8 @@
         name: "{{ username }}"
         groups: "docker"
         append: true
-    
-    - name: Starting and updating the Docker service to start on boot 
+
+    - name: Starting and updating the Docker service to start on boot
       service:
         name: docker
         state: "started"
