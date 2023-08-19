@@ -1,6 +1,6 @@
 # Ansible Role: Docker Installation
 
-This Ansible role facilitates the installation of Docker Community Edition on target machines. It provides a simple and streamlined way to ensure that Docker is properly installed and ready for use.
+This Ansible role facilitates the installation, configuration, and management of Docker Community Edition on target machines. It provides a simple and streamlined way to ensure that Docker is properly installed, configured to start on boot, and grants the specified user rights to run Docker commands.
 
 ## Requirements
 
@@ -10,7 +10,8 @@ No specific requirements are necessary for using this Ansible role.
 
 The role contains a single variable that can be customized:
 
-- `username`: This variable specifies the username for which Docker will be installed. By default, it is set to ubuntu. You can modify this variable to match the target machine's user account.
+- `username`: This variable specifies the username for which Docker will be installed and configured. By default, it is set to `ubuntu`. You can modify this variable to match the target machine's user account.
+
 
 ## Dependencies
 
@@ -28,14 +29,22 @@ Here's an example playbook on how to use this Ansible role:
   roles:
   - role: role_name
       vars:
-        username: target_host's_username
+        username: target_host_username
 ```
 
-Replace your_target_hosts with the appropriate inventory group or hostname, and your_username_here with the desired username.
+Replace `your_target_hosts` with the appropriate inventory group or hostname, and `target_host_username` with the desired username.
+
+## Role Functionality
+
+This role performs the following tasks:
+
+1. Installs Docker Community Edition on the target machine.
+2. Ensures that the Docker service is started and configured to start on boot.
+3. Grants the specified user (`username`) rights to run Docker commands without requiring root privileges.
 
 ## License
 
-This project is licensed under the MIT License. See the LICENSE file for details.
+This project is licensed under the GPL 3.0 License. See the LICENSE file for details.
 
 ## Author Information
 
