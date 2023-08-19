@@ -12,7 +12,6 @@ The role contains a single variable that can be customized:
 
 - `username`: This variable specifies the username for which Docker will be installed and configured. By default, it is set to `ubuntu`. You can modify this variable to match the target machine's user account.
 
-
 ## Dependencies
 
 No dependencies on other Ansible roles are required for this role.
