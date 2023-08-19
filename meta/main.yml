@@ -1,0 +1,7 @@
+galaxy_info:
+  author: blvckmaze
+  description: Role that installs Docker Community Edition onto the target machine(s)
+  license: GPL-3.0-only
+  min_ansible_version: 2.1
+  galaxy_tags: 
+    - docker
